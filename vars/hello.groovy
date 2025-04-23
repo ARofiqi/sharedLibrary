@@ -15,3 +15,7 @@ def say(List<String> names){
         echo "hello ${name}"
     }
 }
+
+def person(Map person){
+    echo "hello ${person.name} and age ${person.age}"
+}
