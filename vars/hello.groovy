@@ -9,3 +9,7 @@ def world(){
 def say(String name){
     "hello ${name}"
 }
+
+def say(List<String> name){
+    "hello ${name}"
+}
