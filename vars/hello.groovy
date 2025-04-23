@@ -19,3 +19,11 @@ def say(List<String> names){
 def person(Map person){
     echo "hello ${person.name} and age ${person.age}"
 }
+
+def config(){
+    def config = LibraryResource("config/build.json")
+    def json = readJSON text: config
+    echo "app: ${json.app}"
+    echo "author: ${json.author}"
+    echo "version: ${json.version}"
+}
