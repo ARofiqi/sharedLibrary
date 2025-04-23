@@ -1,3 +1,8 @@
-def world(){
-    echo "hello world"
+def call() {
+    "Hello call"
 }
+
+def world(){
+    "hello world"
+}
+
