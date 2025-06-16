@@ -17,7 +17,7 @@ def call() {
       stage('Lint') {
         steps {
           echo 'Linting...'
-        //   sh 'npm run lint'
+          sh 'npm run lint'
         }
       }
 
@@ -29,16 +29,25 @@ def call() {
       }
 
       stage('Deploy') {
-        // when {
-        //   branch 'main'
-        // }
-        // steps {
-        //   deployStaticSite(
-        //     remoteUser: 'youruser',
-        //     host: 'your.server.com',
-        //     path: '/var/www/yourapp'
-        //   )
-        // }
+        when {
+          branch 'main'
+        }
+        steps {
+          sshPublisher(
+            publishers: [
+              sshPublisherDesc(
+                configName: 'vps-1',
+                transfers: [
+                  sshTransfer(
+                    sourceFiles: 'dist/**',
+                    removePrefix: 'dist',
+                    remoteDirectory: '/var/www/rofiqi'
+                  )
+                ]
+              )
+            ]
+          )
+        }
         steps {
           echo 'Deploying...'
         }
