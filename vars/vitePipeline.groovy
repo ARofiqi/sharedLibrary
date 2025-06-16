@@ -31,6 +31,23 @@ def call() {
         }
       }
 
+      stage('Verify Files') {
+        steps {
+          sh '''
+            echo "📂 Daftar file di dist/:"
+            ls -la dist/
+            echo "🔍 Cek index.html:"
+            if [ -f dist/index.html ]; then
+              echo "✅ index.html ada"
+              ls -la dist/index.html
+            else
+              echo "❌ index.html tidak ditemukan!"
+              exit 1
+            fi
+          '''
+        }
+      }
+
       stage('Build') {
         steps {
           echo '🏗️ Building...'
