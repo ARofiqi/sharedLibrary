@@ -94,8 +94,8 @@ def call() {
                         docker pull ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}
                         
                         echo '🛑 Stopping existing container...'
-                        docker stop portfolio-container || true
-                        docker rm portfolio-container || true
+                        docker stop portfolio-container
+                        docker rm portfolio-container
                         
                         echo '🚀 Starting new container...'
                         docker run -d \
