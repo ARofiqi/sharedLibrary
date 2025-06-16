@@ -48,6 +48,8 @@ def call() {
         steps {
           echo '🐳 Building Docker Image...'
           script {
+            sh "ls -la"
+            sh "cat Dockerfile || true"
             sh "docker build -t ${env.DOCKER_IMAGE}:${env.DOCKER_TAG} ."
             sh "docker images ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
           }
