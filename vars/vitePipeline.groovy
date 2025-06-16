@@ -54,8 +54,13 @@ def call() {
         steps {
           echo '🐳 Building Docker Image...'
           script {
-            sh "docker build -t ${env.DOCKER_IMAGE}:${env.DOCKER_TAG} ."
-            sh "docker images ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
+            docker.withRegistry('', 'docker-hub-creds') {
+              docker.image('node:16').inside('-v /var/run/docker.sock:/var/run/docker.sock') {
+                echo '🐳 Membuat Docker Image...'
+                sh "docker build -t ${env.DOCKER_IMAGE}:${env.DOCKER_TAG} ."
+                sh "docker images ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
+              }
+            }
           }
         }
       }
@@ -89,7 +94,7 @@ def call() {
         }
       }
 
-      stage('Deploy to VPS') {
+      stage('Pull docker image in VPS') {
         steps {
           script {
             sshPublisher(
