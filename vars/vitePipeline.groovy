@@ -1,6 +1,12 @@
 def call() {
   pipeline {
-    agent any
+    agent {
+      docker {
+        image 'node:16'  # atau image lain yang memiliki docker
+        args '-v /var/run/docker.sock:/var/run/docker.sock'
+      }
+    }
+
 
     environment {
       NODE_ENV = 'production'
