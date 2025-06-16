@@ -2,7 +2,7 @@ def call() {
   pipeline {
     agent {
       docker {
-        image 'node:16'  # atau image lain yang memiliki docker
+        image 'node:16'
         args '-v /var/run/docker.sock:/var/run/docker.sock'
       }
     }
