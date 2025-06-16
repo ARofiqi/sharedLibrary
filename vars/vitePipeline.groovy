@@ -16,14 +16,13 @@ def call() {
 
       stage('Lint') {
         steps {
-          script {
-            def packageJson = readJSON file: 'package.json'
-            if (packageJson.scripts?.lint) {
-              sh 'npm run lint'
-            } else {
-              echo 'No lint script found in package.json, skipping...'
-            }
-          }
+          sh '''
+            if [ -f package.json ] && grep -q '"lint"' package.json; then
+              npm run lint
+            else
+              echo "No lint script found, skipping..."
+            fi
+          '''
         }
       }
 
