@@ -34,9 +34,9 @@ def call() {
       }
 
       stage('Deploy') {
-        when {
-          branch 'main'
-        }
+        // when {
+        //   branch 'main'
+        // }
         steps {
           sshPublisher(
             publishers: [
