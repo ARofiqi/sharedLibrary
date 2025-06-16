@@ -9,8 +9,8 @@ def call() {
     stages {
       stage('Install Dependencies') {
         steps {
-          echo 'Installing dependencies...'
-          sh 'npm ci'
+          echo 'Installing all dependencies (including devDependencies)...'
+          sh 'npm ci --include=dev'
         }
       }
 
