@@ -1,6 +1,6 @@
 def call() {
   pipeline {
-    agent any
+    agent none
 
     environment {
       NODE_ENV = 'production'
