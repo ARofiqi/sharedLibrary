@@ -48,9 +48,6 @@ def call() {
             ]
           )
         }
-        steps {
-          echo 'Deploying...'
-        }
       }
     }
 
