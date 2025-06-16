@@ -1,11 +1,6 @@
 def call() {
   pipeline {
-    agent {
-      docker {
-        image 'node:16'
-        args '-v /var/run/docker.sock:/var/run/docker.sock'
-      }
-    }
+    agent any
 
     environment {
       NODE_ENV = 'production'
@@ -50,6 +45,12 @@ def call() {
       }
 
       stage('Build Docker Image') {
+        agent {
+          docker {
+            image 'node:16'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+          }
+        }
         steps {
           echo '🐳 Building Docker Image...'
           script {
@@ -60,6 +61,12 @@ def call() {
       }
 
       stage('Push Image to Docker Hub') {
+        agent {
+          docker {
+            image 'node:16'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+          }
+        }
         steps {
           echo '🚀 Starting push image...'
           script {
