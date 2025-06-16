@@ -48,24 +48,13 @@ def call() {
         steps {
           echo '🐳 Building Docker Image...'
           script {
-            docker.withRegistry('', 'docker-hub-creds') {
-              docker.image('node:16').inside('-v /var/run/docker.sock:/var/run/docker.sock') {
-                echo '🐳 Membuat Docker Image...'
-                sh "docker build -t ${env.DOCKER_IMAGE}:${env.DOCKER_TAG} ."
-                sh "docker images ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
-              }
-            }
+            sh "docker build -t ${env.DOCKER_IMAGE}:${env.DOCKER_TAG} ."
+            sh "docker images ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
           }
         }
       }
 
       stage('Push Image to Docker Hub') {
-        agent {
-          docker {
-            image 'node:16'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-          }
-        }
         steps {
           echo '🚀 Starting push image...'
           script {
