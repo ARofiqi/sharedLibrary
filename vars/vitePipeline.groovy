@@ -7,7 +7,6 @@ def call() {
       }
     }
 
-
     environment {
       NODE_ENV = 'production'
       DOCKER_IMAGE = 'rofiqi/portofolio'
@@ -54,67 +53,17 @@ def call() {
         steps {
           echo '🐳 Building Docker Image...'
           script {
-            // Verify Dockerfile exists
-            // if (!fileExists('Dockerfile')) {
-            //   writeFile file: 'Dockerfile', text: """
-            //     FROM nginx:alpine
-            //     COPY dist/ /usr/share/nginx/html
-            //     EXPOSE 80
-            //     CMD ["nginx", "-g", "daemon off;"]
-            //   """
-            //   echo 'ℹ️ Created default Dockerfile for static site'
-            // }
-            
             sh "docker build -t ${env.DOCKER_IMAGE}:${env.DOCKER_TAG} ."
-            sh "docker images | grep ${env.DOCKER_IMAGE}"
+            sh "docker images ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}"
           }
         }
       }
 
-      stage('Test Docker Image') {
+      stage('Push Image to Docker Hub') {
         steps {
-          echo '🔍 Testing Docker Image...'
+          echo '🚀 Starting push image...'
           script {
             try {
-              sh """
-                docker run -d --name portofolio -p 8080:80 ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}
-                sleep 5
-                curl -s http://localhost:8080 | grep -q '<html' && echo '✅ HTML content found'
-                docker stop portofolio
-                docker rm portofolio
-              """
-            } catch (e) {
-              error '❌ Docker container test failed'
-            }
-          }
-        }
-      }
-
-      stage('Deploy') {
-        steps {
-          echo '🚀 Starting Deployment...'
-          script {
-            try {
-              // Option 1: Deploy with SSH (original method)
-              // echo '🔄 Using SSH deployment method...'
-              // sshPublisher(
-              //   publishers: [
-              //     sshPublisherDesc(
-              //       configName: 'vps-1',
-              //       verbose: true,
-              //       transfers: [
-              //         sshTransfer(
-              //           sourceFiles: 'dist/**',
-              //           removePrefix: 'dist',
-              //           remoteDirectory: '/app',
-              //           execCommand: 'echo "Deployed files:" && ls -la /app'
-              //         )
-              //       ]
-              //     )
-              //   ]
-              // )
-
-              // Option 2: Deploy Docker container (alternative method)
               echo '🐳 Using Docker deployment method...'
               withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                 sh """
@@ -133,10 +82,39 @@ def call() {
         }
       }
 
-      stage('Cleanup') {
+      stage('Deploy to VPS') {
         steps {
-          echo '🧹 Cleaning up...'
-          sh "docker rmi ${env.DOCKER_IMAGE}:${env.DOCKER_TAG} || true"
+          script {
+            sshPublisher(
+              publishers: [
+                sshPublisherDesc(
+                  configName: 'vps-1',
+                  verbose: true,
+                  transfers: [
+                    sshTransfer(
+                      execCommand: """
+                        echo '🐳 Pulling Docker image...'
+                        docker pull ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}
+                        
+                        echo '🛑 Stopping existing container...'
+                        docker stop portfolio-container || true
+                        docker rm portfolio-container || true
+                        
+                        echo '🚀 Starting new container...'
+                        docker run -d \
+                          --name portfolio-container \
+                          -p 80:3000 \
+                          ${env.DOCKER_IMAGE}:${env.DOCKER_TAG}
+                        
+                        echo '✅ Deployment completed!'
+                        docker ps
+                      """
+                    )
+                  ]
+                )
+              ]
+            )
+          }
         }
       }
     }
@@ -154,4 +132,4 @@ def call() {
       }
     }
   }
-}
+} 
